@@ -5,15 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DC Driving Alone to Work Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        #map-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #08519c; /* Dark blue color matching the 5% value */
+            margin-bottom: 10px;
+            padding: 10px;
+        }
         #map { 
-            height: 1200px;
-            background-color: white; /* Set background to white */
+            height: 1150px; /* Reduced height to accommodate the title */
+            background-color: white;
         }
     </style>
 </head>
 <body>
-    <div id="map"></div>
+    <div id="container">
+        <div id="map-title">DC % Driving Alone to Work by Census Tract</div>
+        <div id="map"></div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <script>
         var map = L.map('map', {
@@ -30,14 +51,8 @@
         }).addTo(map);
 
         fetch('drive_to_work.geojson')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                console.log('GeoJSON data loaded:', data);
                 const geoJsonLayer = L.geoJSON(data, {
                     style: function(feature) {
                         return {
@@ -54,23 +69,19 @@
                     }
                 }).addTo(map);
                 map.fitBounds(geoJsonLayer.getBounds());
-                console.log('GeoJSON layer added to map');
             })
-            .catch(error => {
-                console.error('Error loading or parsing GeoJSON:', error);
-                alert('Error loading map data. Please check the console for more information.');
-            });
+            .catch(error => console.error('Error loading or parsing GeoJSON:', error));
 
         function getColor(d) {
-            return d > 0.70 ? '#a63603' : // Red (45%)
-                   d > 0.60 ? '#e6550d' : // Dark Orange (40%)
-                   d > 0.50 ? '#fd8d3c' : // Orange (35%)
-                   d > 0.40 ? '#fdae6b' : // Yellow (30%)
-                   d > 0.30 ? '#bae4b3' : // Yellow-Green (25%)
-                   d > 0.20 ? '#bdd7e7' : // Light Green (20%)
-                   d > 0.10 ? '#6baed6' : // Blue-Green (15%)
-                   d > 0.05 ? '#3182bd' : // Dark Blue (10%)
-                              '#08519c';  // Darkest Blue (5%)
+            return d > 0.70 ? '#a63603' :
+                   d > 0.60 ? '#e6550d' :
+                   d > 0.50 ? '#fd8d3c' :
+                   d > 0.40 ? '#fdae6b' :
+                   d > 0.30 ? '#bae4b3' :
+                   d > 0.20 ? '#bdd7e7' :
+                   d > 0.10 ? '#6baed6' :
+                   d > 0.05 ? '#3182bd' :
+                              '#08519c';
         }
     </script>
 </body>
