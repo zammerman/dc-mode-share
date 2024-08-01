@@ -99,7 +99,7 @@
         fetch('drive_to_work.geojson')
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(HTTP error! status: ${response.status});
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
@@ -108,7 +108,7 @@
                 const geoJsonLayer = L.geoJSON(data, {
                     style: function(feature) {
                         // Add additional tracts to be colored gray
-                        const grayTracts = ["9800", "73.01"];
+                        const grayTracts = ["9800", "another_tract_id"];
                         return {
                             fillColor: grayTracts.includes(feature.properties.NAME20) ? '#A9A9A9' : getColor(feature.properties['% drive alone']),
                             weight: 2,
@@ -119,7 +119,7 @@
                     },
                     onEachFeature: function(feature, layer) {
                         const percent = (feature.properties['% drive alone'] * 100).toFixed(1);
-                        layer.bindPopup(Tract: ${feature.properties.NAME20}<br>Driving Alone: ${percent}%);
+                        layer.bindPopup(`Tract: ${feature.properties.NAME20}<br>Driving Alone: ${percent}%`);
                     }
                 }).addTo(map);
                 map.fitBounds(geoJsonLayer.getBounds());
