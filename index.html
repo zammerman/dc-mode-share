@@ -36,14 +36,14 @@
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            margin: 30px;
+            margin: 10px;
         }
         .legend i {
-            width: 25px;
-            height: 25px;
+            width: 18px;
+            height: 18px;
             float: left;
-            margin-right: 15px;
-            opacity: 0.8;
+            margin-right: 8px;
+            opacity: 0.7;
         }
     </style>
 </head>
@@ -61,9 +61,10 @@
             attributionControl: false
         });
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            opacity: 0,
-            maxZoom: 19
+        // Using Stamen Toner as the default base map
+        L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, under <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="https://openstreetmap.org">OpenStreetMap</a>, under ODbL.'
         }).addTo(map);
 
         var legend = L.control({position: 'topright'}); // Change position to top right
@@ -92,7 +93,7 @@
                         return {
                             fillColor: getColor(feature.properties['% drive alone']),
                             weight: 1,
-                            opacity: 0.8,
+                            opacity: 1,
                             color: 'white',
                             fillOpacity: 1
                         };
