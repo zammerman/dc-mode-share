@@ -54,6 +54,8 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <script>
+        console.log("Initializing map...");
+        
         var map = L.map('map', {
             center: [38.9072, -77.0369],
             zoom: 11,
@@ -61,11 +63,18 @@
             attributionControl: false
         });
 
-        // Using Stamen Toner as the default base map
-        L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+        // Using Stadia Maps for the Stamen Toner tiles
+        var stamenToner = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png?api_key=9bc3f697-3a2d-429c-9781-1fca6c8e51e0', {
             maxZoom: 20,
-            attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, under <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="https://openstreetmap.org">OpenStreetMap</a>, under ODbL.'
-        }).addTo(map);
+            attribution: 'Map tiles by <a href="https://stadiamaps.com/">Stadia Maps</a>, under <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>. Data by <a href="https://openstreetmap.org">OpenStreetMap</a>, under ODbL.'
+        });
+
+        stamenToner.on('tileerror', function(error, tile) {
+            console.error("Error loading tile: ", error, tile);
+        });
+
+        stamenToner.addTo(map);
+        console.log("Stadia Maps Stamen Toner tiles added to map.");
 
         var legend = L.control({position: 'topright'}); // Change position to top right
 
@@ -84,14 +93,21 @@
         };
 
         legend.addTo(map);
+        console.log("Legend added to map.");
 
         fetch('drive_to_work.geojson')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log("GeoJSON data loaded:", data);
                 const geoJsonLayer = L.geoJSON(data, {
                     style: function(feature) {
                         // Add additional tracts to be colored gray
-                        const grayTracts = ["9800", "73.01"];
+                        const grayTracts = ["9800", "another_tract_id"];
                         return {
                             fillColor: grayTracts.includes(feature.properties.NAME20) ? '#A9A9A9' : getColor(feature.properties['% drive alone']),
                             weight: 1,
@@ -106,8 +122,12 @@
                     }
                 }).addTo(map);
                 map.fitBounds(geoJsonLayer.getBounds());
+                console.log("GeoJSON layer added to map and bounds set.");
             })
-            .catch(error => console.error('Error loading or parsing GeoJSON:', error));
+            .catch(error => {
+                console.error('Error loading or parsing GeoJSON:', error);
+                alert('Error loading map data. Please check the console for more information.');
+            });
 
         function getColor(d) {
             return d > 0.70 ? '#a63603' :
@@ -120,6 +140,8 @@
                    d > 0.05 ? '#3182bd' :
                               '#08519c';
         }
+
+        console.log("Map initialization complete.");
     </script>
 </body>
 </html>
