@@ -6,7 +6,10 @@
     <title>DC Driving Alone to Work Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
     <style>
-        #map { height: 1200px; }
+        #map { 
+            height: 1200px;
+            background-color: white; /* Set background to white */
+        }
     </style>
 </head>
 <body>
@@ -20,7 +23,10 @@
             attributionControl: false
         });
 
-        // Remove the tileLayer (OpenStreetMap) setup
+        // Add a blank tile layer
+        L.tileLayer('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=', {
+            maxZoom: 18,
+        }).addTo(map);
 
         fetch('drive_to_work.geojson')
             .then(response => response.json())
@@ -31,8 +37,8 @@
                             fillColor: getColor(feature.properties['% drive alone']),
                             weight: 1,
                             opacity: 1,
-                            color: 'white',
-                            fillOpacity: 1 // Set to 1 for no opacity
+                            color: 'black', // Change border color to black for better visibility
+                            fillOpacity: 1
                         };
                     },
                     onEachFeature: function(feature, layer) {
@@ -54,7 +60,7 @@
            d > 0.10 ? '#6baed6' : // Blue-Green (15%)
            d > 0.05 ? '#3182bd' : // Dark Blue (10%)
                       '#08519c';  // Darkest Blue (5%)
-}
+        }
     </script>
 </body>
 </html>
