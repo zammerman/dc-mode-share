@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DC % Driving Alone to Work By Census Tract</title>
+    <title>DC Driving Alone to Work Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
     <style>
-        #map { height: 800px; }
+        #map { height: 600px; }
     </style>
 </head>
 <body>
@@ -24,7 +24,7 @@
         fetch('drive_to_work.geojson')
             .then(response => response.json())
             .then(data => {
-                L.geoJSON(data, {
+                const geoJsonLayer = L.geoJSON(data, {
                     style: function(feature) {
                         return {
                             fillColor: getColor(feature.properties['% drive alone']),
@@ -35,17 +35,20 @@
                         };
                     },
                     onEachFeature: function(feature, layer) {
-                        layer.bindPopup("Driving Alone: " + feature.properties['% drive alone'] + "%");
+                        const percent = (feature.properties['% drive alone'] * 100).toFixed(1);
+                        layer.bindPopup(`Driving Alone: ${percent}%`);
                     }
                 }).addTo(map);
-            });
+                map.fitBounds(geoJsonLayer.getBounds());
+            })
+            .catch(error => console.error('Error loading GeoJSON:', error));
 
         function getColor(d) {
-            return d > 70 ? '#ff0000' :
-                   d > 50 ? '#ff7f00' :
-                   d > 30 ? '#ffff00' :
-                   d > 20 ? '#00ff00' :
-                            '#0000ff';
+            return d > 0.70 ? '#ff0000' :
+                   d > 0.50 ? '#ff7f00' :
+                   d > 0.30 ? '#ffff00' :
+                   d > 0.20 ? '#00ff00' :
+                              '#0000ff';
         }
     </script>
 </body>
