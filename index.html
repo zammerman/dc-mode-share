@@ -142,6 +142,55 @@
                               '#08519c';
         }
 
+        // Function to get color based on metro line name
+        function getLineColor(lineName) {
+            switch (lineName) {
+                case 'Red Line':
+                    return '#FF0000'; // Red
+                case 'Blue Line':
+                    return '#0000FF'; // Blue
+                case 'Green Line':
+                    return '#008000'; // Green
+                case 'Yellow Line':
+                    return '#FFFF00'; // Yellow
+                case 'Orange Line':
+                    return '#FFA500'; // Orange
+                case 'Silver Line':
+                    return '#C0C0C0'; // Silver
+                default:
+                    return '#000000'; // Default to black if line name is not recognized
+            }
+        }
+
+        // Add the metro lines GeoJSON layer
+        fetch('dc_metro.geojson')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Metro lines GeoJSON data loaded:", data);
+                L.geoJSON(data, {
+                    style: function(feature) {
+                        return {
+                            color: getLineColor(feature.properties.line),
+                            weight: 3,
+                            opacity: 0.9
+                        };
+                    },
+                    onEachFeature: function(feature, layer) {
+                        layer.bindPopup(`Line: ${feature.properties.line}`);
+                    }
+                }).addTo(map);
+                console.log("Metro lines layer added to map.");
+            })
+            .catch(error => {
+                console.error('Error loading or parsing Metro lines GeoJSON:', error);
+                alert('Error loading metro lines data. Please check the console for more information.');
+            });
+
         console.log("Map initialization complete.");
     </script>
 </body>
