@@ -13,21 +13,34 @@
     <div id="map"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <script>
-        // Initialize map
-        var map = L.map('map').setView([38.9072, -77.0369], 11);
+        var map = L.map('map').setView([38.9072, -77.0369], 10);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // Load GeoJSON data
         fetch('drive_to_work.geojson')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('GeoJSON data loaded:', data);
+                if (!data.features || !Array.isArray(data.features)) {
+                    throw new Error('Invalid GeoJSON structure');
+                }
                 const geoJsonLayer = L.geoJSON(data, {
                     style: function(feature) {
+                        const driveAlonePercent = feature.properties['% drive alone'];
+                        console.log('Drive alone percent:', driveAlonePercent);
+                        if (driveAlonePercent === undefined) {
+                            console.error('Missing "% drive alone" property for feature:', feature);
+                            return { fillColor: '#gray', weight: 1, opacity: 1, color: 'white', fillOpacity: 0.7 };
+                        }
                         return {
-                            fillColor: getColor(feature.properties['% drive alone']),
+                            fillColor: getColor(driveAlonePercent),
                             weight: 1,
                             opacity: 1,
                             color: 'white',
@@ -41,7 +54,7 @@
                 }).addTo(map);
                 map.fitBounds(geoJsonLayer.getBounds());
             })
-            .catch(error => console.error('Error loading GeoJSON:', error));
+            .catch(error => console.error('Error loading or parsing GeoJSON:', error));
 
         function getColor(d) {
             return d > 0.70 ? '#ff0000' :
