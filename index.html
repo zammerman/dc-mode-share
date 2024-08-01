@@ -108,7 +108,7 @@
                 const geoJsonLayer = L.geoJSON(data, {
                     style: function(feature) {
                         // Add additional tracts to be colored gray
-                        const grayTracts = ["9800", "another_tract_id"];
+                        const grayTracts = ["9800", "73.01"];
                         return {
                             fillColor: grayTracts.includes(feature.properties.NAME20) ? '#A9A9A9' : getColor(feature.properties['% drive alone']),
                             weight: 2,
