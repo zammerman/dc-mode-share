@@ -91,7 +91,7 @@
                 const geoJsonLayer = L.geoJSON(data, {
                     style: function(feature) {
                         return {
-                            fillColor: getColor(feature.properties['% drive alone']),
+                            fillColor: feature.properties.NAME20 === "9800" ? '#A9A9A9' : getColor(feature.properties['% drive alone']),
                             weight: 1,
                             opacity: 1,
                             color: 'white',
