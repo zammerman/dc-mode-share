@@ -23,21 +23,28 @@
             attributionControl: false
         });
 
-        // Add a blank tile layer
-        L.tileLayer('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=', {
-            maxZoom: 18,
+        // Add a transparent tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            opacity: 0,
+            maxZoom: 19
         }).addTo(map);
 
         fetch('drive_to_work.geojson')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('GeoJSON data loaded:', data);
                 const geoJsonLayer = L.geoJSON(data, {
                     style: function(feature) {
                         return {
                             fillColor: getColor(feature.properties['% drive alone']),
                             weight: 1,
                             opacity: 1,
-                            color: 'black', // Change border color to black for better visibility
+                            color: 'white',
                             fillOpacity: 1
                         };
                     },
@@ -47,19 +54,23 @@
                     }
                 }).addTo(map);
                 map.fitBounds(geoJsonLayer.getBounds());
+                console.log('GeoJSON layer added to map');
             })
-            .catch(error => console.error('Error loading or parsing GeoJSON:', error));
+            .catch(error => {
+                console.error('Error loading or parsing GeoJSON:', error);
+                alert('Error loading map data. Please check the console for more information.');
+            });
 
         function getColor(d) {
-    return d > 0.70 ? '#a63603' : // Red (45%)
-           d > 0.60 ? '#e6550d' : // Dark Orange (40%)
-           d > 0.50 ? '#fd8d3c' : // Orange (35%)
-           d > 0.40 ? '#fdae6b' : // Yellow (30%)
-           d > 0.30 ? '#bae4b3' : // Yellow-Green (25%)
-           d > 0.20 ? '#bdd7e7' : // Light Green (20%)
-           d > 0.10 ? '#6baed6' : // Blue-Green (15%)
-           d > 0.05 ? '#3182bd' : // Dark Blue (10%)
-                      '#08519c';  // Darkest Blue (5%)
+            return d > 0.70 ? '#a63603' : // Red (45%)
+                   d > 0.60 ? '#e6550d' : // Dark Orange (40%)
+                   d > 0.50 ? '#fd8d3c' : // Orange (35%)
+                   d > 0.40 ? '#fdae6b' : // Yellow (30%)
+                   d > 0.30 ? '#bae4b3' : // Yellow-Green (25%)
+                   d > 0.20 ? '#bdd7e7' : // Light Green (20%)
+                   d > 0.10 ? '#6baed6' : // Blue-Green (15%)
+                   d > 0.05 ? '#3182bd' : // Dark Blue (10%)
+                              '#08519c';  // Darkest Blue (5%)
         }
     </script>
 </body>
