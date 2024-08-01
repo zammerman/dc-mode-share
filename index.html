@@ -111,10 +111,10 @@
                         const grayTracts = ["9800", "another_tract_id"];
                         return {
                             fillColor: grayTracts.includes(feature.properties.NAME20) ? '#A9A9A9' : getColor(feature.properties['% drive alone']),
-                            weight: 1,
+                            weight: 2,
                             opacity: 1,
                             color: 'white',
-                            fillOpacity: 0.8
+                            fillOpacity: 0.9
                         };
                     },
                     onEachFeature: function(feature, layer) {
