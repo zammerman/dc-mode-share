@@ -20,13 +20,28 @@
             font-family: 'Poppins', sans-serif;
             font-size: 24px;
             font-weight: 700;
-            color: #08519c; /* Dark blue color matching the 5% value */
+            color: #08519c;
             margin-bottom: 10px;
             padding: 10px;
         }
         #map { 
-            height: 1150px; /* Reduced height to accommodate the title */
+            height: 1150px;
             background-color: white;
+        }
+        .legend {
+            line-height: 18px;
+            color: #555;
+            background-color: white;
+            padding: 6px 8px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
         }
     </style>
 </head>
@@ -44,11 +59,28 @@
             attributionControl: false
         });
 
-        // Add a transparent tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             opacity: 0,
             maxZoom: 19
         }).addTo(map);
+
+        var legend = L.control({position: 'bottomright'});
+
+        legend.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'info legend'),
+                grades = [0, 5, 10, 20, 30, 40, 50, 60, 70],
+                labels = [];
+
+            for (var i = 0; i < grades.length; i++) {
+                div.innerHTML +=
+                    '<i style="background:' + getColor(grades[i] / 100 + 0.01) + '"></i> ' +
+                    grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '%<br>' : '%+');
+            }
+
+            return div;
+        };
+
+        legend.addTo(map);
 
         fetch('drive_to_work.geojson')
             .then(response => response.json())
